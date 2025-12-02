@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="0; url=PROJECT/INDEX/index.html">
+    <title>Светосила - Redirecting...</title>
+    <script>
+        // Instant redirect
+        window.location.replace("PROJECT/INDEX/index.html");
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #2b2b2b;
+            color: white;
+            text-align: center;
+        }
+        .redirect-message {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .redirect-message h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        .redirect-message p {
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+        .redirect-message a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .redirect-message a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-message">
+        <h1>💡 Светосила</h1>
+        <p>Перенаправление на документацию проекта...</p>
+        <div class="spinner"></div>
+        <p style="font-size: 0.9em; opacity: 0.8;">
+            Если автоматическое перенаправление не работает:
+        </p>
+        <a href="PROJECT/INDEX/index.html">Перейти вручную →</a>
+    </div>
+</body>
+</html>
+
