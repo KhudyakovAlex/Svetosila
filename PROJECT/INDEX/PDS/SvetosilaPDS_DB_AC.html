@@ -9,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
 </head>
 <body>
     <!-- Logo Bar -->
@@ -43,6 +47,66 @@
             <p>Светосила v1.0. Спецификации на разработку</p>
             <p><strong>Последнее изменение:</strong> 13.12.2025, 19:20 МСК</p>
 
+            <div class="mermaid">
+erDiagram
+    AC_ROLES ||--o{ AC_USERS : "ROLE_ID"
+    AC_ROLES ||--o{ AC_ROLE_PERMISSIONS : "ROLE_ID"
+    AC_PERMISSIONS ||--o{ AC_ROLE_PERMISSIONS : "PERMISSION_ID"
+    AC_ROLES ||--o{ AC_ROLE_ROLES : "PARENT_ROLE_ID"
+    AC_ROLES ||--o{ AC_ROLE_ROLES : "CHILD_ROLE_ID"
+
+    AC_USERS {
+        INTEGER ID PK
+        TEXT LOGIN
+        TEXT PASSWORD
+        TEXT LAST_NAME
+        TEXT FIRST_NAME
+        TEXT MIDDLE_NAME
+        INTEGER ROLE_ID FK
+    }
+
+    AC_ROLES {
+        INTEGER ID PK
+        TEXT NAME
+    }
+
+    AC_PERMISSIONS {
+        INTEGER ID PK
+        TEXT NAME
+        BOOLEAN CAN_CREATE
+        BOOLEAN CAN_READ
+        BOOLEAN CAN_UPDATE
+        BOOLEAN CAN_DELETE
+    }
+
+    AC_ROLE_PERMISSIONS {
+        INTEGER ID PK
+        INTEGER ROLE_ID FK
+        INTEGER PERMISSION_ID FK
+    }
+
+    AC_ROLE_ROLES {
+        INTEGER ID PK
+        INTEGER PARENT_ROLE_ID FK
+        INTEGER CHILD_ROLE_ID FK
+    }
+
+    AC_PERMISSIONS ||--o{ AC_TABLES : "AC_PERMISSION_ID"
+    AC_TABLES ||--o{ AC_FIELDS : "AC_TABLE_ID"
+
+    AC_TABLES {
+        INTEGER ID PK
+        TEXT NAME
+        INTEGER AC_PERMISSION_ID FK
+    }
+
+    AC_FIELDS {
+        INTEGER ID PK
+        TEXT NAME
+        INTEGER AC_TABLE_ID FK
+    }
+            </div>
+
             <h2 id="1-назначение-документа">1. Назначение документа</h2>
             <p>Описать структуру базы данных системы контроля доступа.</p>
 
@@ -52,7 +116,7 @@
 
             <h2 id="4-таблицы">4. Таблицы</h2>
 
-            <h3 id="41-users">4.1. USERS</h3>
+            <h3 id="41-ac-users">4.1. AC_USERS</h3>
             <p>Пользователи.</p>
             <ul>
                 <li>ID (INTEGER / PK)</li>
@@ -64,22 +128,25 @@
                 <li>ROLE_ID (INTEGER / FK) - роль пользователя</li>
             </ul>
 
-            <h3 id="42-roles">4.2. ROLES</h3>
+            <h3 id="42-ac-roles">4.2. AC_ROLES</h3>
             <p>Роли.</p>
             <ul>
                 <li>ID (INTEGER / PK)</li>
                 <li>NAME (TEXT) - наименование роли</li>
             </ul>
 
-            <h3 id="43-permissions">4.3. PERMISSIONS</h3>
+            <h3 id="43-ac-permissions">4.3. AC_PERMISSIONS</h3>
             <p>Права.</p>
             <ul>
                 <li>ID (INTEGER / PK)</li>
                 <li>NAME (TEXT) - наименование права</li>
-                <li>CODE (TEXT) - код права (для использования в коде)</li>
+                <li>CAN_CREATE (BOOLEAN) - разрешение на создание</li>
+                <li>CAN_READ (BOOLEAN) - разрешение на чтение</li>
+                <li>CAN_UPDATE (BOOLEAN) - разрешение на редактирование</li>
+                <li>CAN_DELETE (BOOLEAN) - разрешение на удаление</li>
             </ul>
 
-            <h3 id="44-role-permissions">4.4. ROLE_PERMISSIONS</h3>
+            <h3 id="44-ac-role-permissions">4.4. AC_ROLE_PERMISSIONS</h3>
             <p>Связь ролей с правами. У роли может быть несколько прав.</p>
             <ul>
                 <li>ID (INTEGER / PK)</li>
@@ -87,12 +154,28 @@
                 <li>PERMISSION_ID (INTEGER / FK) - право</li>
             </ul>
 
-            <h3 id="45-role-roles">4.5. ROLE_ROLES</h3>
+            <h3 id="45-ac-role-roles">4.5. AC_ROLE_ROLES</h3>
             <p>Иерархия ролей. Роль может включать другие роли.</p>
             <ul>
                 <li>ID (INTEGER / PK)</li>
                 <li>PARENT_ROLE_ID (INTEGER / FK) - родительская роль</li>
                 <li>CHILD_ROLE_ID (INTEGER / FK) - дочерняя роль (входит в родительскую)</li>
+            </ul>
+
+            <h3 id="46-ac-tables">4.6. AC_TABLES</h3>
+            <p>Таблицы, к которым применяются права.</p>
+            <ul>
+                <li>ID (INTEGER / PK)</li>
+                <li>NAME (TEXT) - наименование таблицы</li>
+                <li>AC_PERMISSION_ID (INTEGER / FK) - право доступа к таблице</li>
+            </ul>
+
+            <h3 id="47-ac-fields">4.7. AC_FIELDS</h3>
+            <p>Поля таблиц.</p>
+            <ul>
+                <li>ID (INTEGER / PK)</li>
+                <li>NAME (TEXT) - наименование поля</li>
+                <li>AC_TABLE_ID (INTEGER / FK) - таблица, к которой относится поле</li>
             </ul>
 
             <h2 id="5-вопросы">5. Вопросы</h2>
@@ -104,4 +187,3 @@
     <script src="../assets/js/main.js"></script>
 </body>
 </html>
-
