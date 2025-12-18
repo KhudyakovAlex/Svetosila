@@ -1,0 +1,200 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Скрипт для обновления index.html из PROJECT/*.md
+Обновляет:
+- Дневник коротышек из PROJECT/log.md
+- Статусы из PROJECT/status.md
+"""
+
+import re
+import sys
+from pathlib import Path
+
+def update_log(repo_root):
+    """Обновить дневник коротышек из PROJECT/log.md"""
+    log_file = Path(repo_root) / 'PROJECT' / 'log.md'
+    index_file = Path(repo_root) / 'PROJECT' / 'INDEX' / 'index.html'
+    
+    if not log_file.exists():
+        print(f"[!] Log file not found: {log_file}")
+        return False
+    
+    if not index_file.exists():
+        print(f"[!] Index file not found: {index_file}")
+        return False
+    
+    # Read log.md
+    with open(log_file, 'r', encoding='utf-8') as f:
+        log_content = f.read()
+    
+    # Parse log entries (format: YYYY-MM-DD HH:MM — text)
+    entries = []
+    for line in log_content.split('\n'):
+        line = line.strip()
+        if not line:
+            continue
+        
+        match = re.match(r'^(\d{4}-\d{2}-\d{2}\s+\d{1,2}:\d{2})\s*[—–-]\s*(.+)$', line)
+        if match:
+            date_time = match.group(1)
+            text = match.group(2)
+            entries.append((date_time, text))
+    
+    if not entries:
+        print("[!] No log entries found in log.md")
+        return False
+    
+    # Generate HTML
+    log_html_parts = []
+    for date_time, text in entries:
+        log_html_parts.append(f'''            <div class="log-entry">
+                <span class="log-date">{date_time}</span>
+                <p class="log-text">{text}</p>
+            </div>''')
+    
+    log_html = '\n'.join(log_html_parts)
+    
+    # Read index.html
+    with open(index_file, 'r', encoding='utf-8') as f:
+        index_content = f.read()
+    
+    # Replace log entries
+    pattern = r'(<div class="hero-log">\s*<h3>Дневник коротышек</h3>\s*)((?:<div class="log-entry">.*?</div>\s*)+)(\s*</div>)'
+    
+    def replace_log_fn(match):
+        before = match.group(1)
+        after = match.group(3)
+        return before + '\n' + log_html + '\n        ' + after
+    
+    new_content, count = re.subn(pattern, replace_log_fn, index_content, flags=re.DOTALL)
+    
+    if count == 0:
+        print("[!] Could not find log section in index.html")
+        return False
+    
+    # Write updated index.html
+    with open(index_file, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    
+    print(f"[OK] Updated log with {len(entries)} entries")
+    return True
+
+
+def update_status(repo_root):
+    """Обновить статусы из PROJECT/status.md"""
+    status_file = Path(repo_root) / 'PROJECT' / 'status.md'
+    index_file = Path(repo_root) / 'PROJECT' / 'INDEX' / 'index.html'
+    
+    if not status_file.exists():
+        print(f"[!] Status file not found: {status_file}")
+        return False
+    
+    if not index_file.exists():
+        print(f"[!] Index file not found: {index_file}")
+        return False
+    
+    # Read status.md
+    with open(status_file, 'r', encoding='utf-8') as f:
+        status_content = f.read()
+    
+    # Parse sections
+    sections = {
+        'postponed': [],
+        'doing': [],
+        'done': []
+    }
+    
+    current_section = None
+    for line in status_content.split('\n'):
+        line_stripped = line.strip()
+        
+        if 'послезавтра' in line_stripped or 'Отложено' in line_stripped:
+            current_section = 'postponed'
+        elif 'сейчас делаем' in line_stripped or 'Прям сейчас' in line_stripped:
+            current_section = 'doing'
+        elif 'Готовченко' in line_stripped:
+            current_section = 'done'
+        elif line_stripped.startswith('- ') and current_section:
+            item = line_stripped[2:].strip()
+            sections[current_section].append(item)
+    
+    # Generate HTML for each section
+    def generate_section_html(items):
+        if not items:
+            return '                    <li>—</li>'
+        return '\n'.join([f'                    <li>{item}</li>' for item in items])
+    
+    # Read index.html
+    with open(index_file, 'r', encoding='utf-8') as f:
+        index_content = f.read()
+    
+    # Replace postponed section
+    pattern_postponed = r'(<div class="status-block">\s*<h3>Отложено на <s>завтра</s> послезавтра</h3>\s*<ul>\s*)((?:<li>.*?</li>\s*)+)(\s*</ul>\s*</div>)'
+    new_content = re.sub(
+        pattern_postponed,
+        lambda m: m.group(1) + '\n' + generate_section_html(sections['postponed']) + '\n' + m.group(3),
+        index_content,
+        flags=re.DOTALL
+    )
+    
+    # Replace doing section
+    pattern_doing = r'(<div class="status-block">\s*<h3>Прям сейчас делаем</h3>\s*<ul>\s*)((?:<li>.*?</li>\s*)+)(\s*</ul>\s*</div>)'
+    new_content = re.sub(
+        pattern_doing,
+        lambda m: m.group(1) + '\n' + generate_section_html(sections['doing']) + '\n' + m.group(3),
+        new_content,
+        flags=re.DOTALL
+    )
+    
+    # Replace done section
+    pattern_done = r'(<div class="status-block">\s*<h3>Готовченко</h3>\s*<ul>\s*)((?:<li>.*?</li>\s*)+)(\s*</ul>\s*</div>)'
+    new_content = re.sub(
+        pattern_done,
+        lambda m: m.group(1) + '\n' + generate_section_html(sections['done']) + '\n' + m.group(3),
+        new_content,
+        flags=re.DOTALL
+    )
+    
+    # Write updated index.html
+    with open(index_file, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    
+    print(f"[OK] Updated status sections")
+    return True
+
+
+def main():
+    """Main function"""
+    print('=' * 60)
+    print('Обновление index.html из PROJECT/*.md')
+    print('=' * 60)
+    
+    # Get repo root (parent of PROJECT/INDEX)
+    repo_root = Path(__file__).parent.parent.parent
+    
+    print(f'Repo root: {repo_root}')
+    
+    success = True
+    
+    # Update log
+    if not update_log(repo_root):
+        success = False
+    
+    # Update status
+    if not update_status(repo_root):
+        success = False
+    
+    print('=' * 60)
+    if success:
+        print('Обновление завершено успешно')
+    else:
+        print('Обновление завершено с ошибками')
+    print('=' * 60)
+    
+    return 0 if success else 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+

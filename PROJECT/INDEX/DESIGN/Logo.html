@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Логотипы - Светосила</title>
+    <link rel="icon" type="image/x-icon" href="../assets/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .gallery-item {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-left: 4px solid var(--accent-primary);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .gallery-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 15px;
+            background: white;
+            padding: 10px;
+        }
+        .gallery-item .filename {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        .gallery-item .file-info {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Bar -->
+    <div class="logo-bar">
+        <div class="logo-bar-container">
+            <a href="../index.html" style="margin-left: 10px;">
+                <img src="../assets/img/SvetosilaLogoFull.PNG" alt="Светосила" class="logo">
+            </a>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <a href="https://github.com/KhudyakovAlex/Svetosila" target="_blank" class="github-link" style="margin-right: 10px;">GitHub →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Title -->
+    <div class="page-title-container" style="max-width: 1400px; margin: 0 auto; padding: 40px 20px 20px 20px;">
+        <h1>Логотипы</h1>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="gallery">
+            <div class="gallery-item">
+                <img src="../../../DESIGN/Logo/SvetosilaLogoFull.PNG" alt="SvetosilaLogoFull.PNG">
+                <div class="filename">SvetosilaLogoFull.PNG</div>
+                <div class="file-info">Полный логотип (PNG)</div>
+            </div>
+            <div class="gallery-item">
+                <img src="../../../DESIGN/Logo/Svetosila.svg" alt="Svetosila.svg">
+                <div class="filename">Svetosila.svg</div>
+                <div class="file-info">Логотип (SVG)</div>
+            </div>
+            <div class="gallery-item">
+                <img src="../../../DESIGN/Logo/SvetosilaFull.svg" alt="SvetosilaFull.svg">
+                <div class="filename">SvetosilaFull.svg</div>
+                <div class="file-info">Полный логотип (SVG)</div>
+            </div>
+            <div class="gallery-item">
+                <img src="../../../DESIGN/Logo/photo_2025-12-18_16-56-53.jpg" alt="photo_2025-12-18_16-56-53.jpg">
+                <div class="filename">photo_2025-12-18_16-56-53.jpg</div>
+                <div class="file-info">Вариант логотипа (JPG)</div>
+            </div>
+            <div class="gallery-item">
+                <img src="../../../DESIGN/Logo/photo_2025-12-18_16-57-24.jpg" alt="photo_2025-12-18_16-57-24.jpg">
+                <div class="filename">photo_2025-12-18_16-57-24.jpg</div>
+                <div class="file-info">Вариант логотипа (JPG)</div>
+            </div>
+        </div>
+        <p style="margin-top: 30px; color: var(--text-secondary); font-size: 0.9em;">
+            <strong>Примечание:</strong> Файл ss_logo.psd (исходник Photoshop) доступен в репозитории, но не отображается на странице.
+        </p>
+    </div>
+</body>
+</html>
+
