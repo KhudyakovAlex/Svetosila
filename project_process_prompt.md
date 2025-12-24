@@ -56,6 +56,17 @@ YYYY-MM-DD HH:MM — текст записи
 
 **ВАЖНО**: КАЖДАЯ запись ДОЛЖНА начинаться с даты и времени.
 
+**Автоматическое добавление даты:**
+- При обработке репозитория: найти записи БЕЗ даты/времени в начале
+- Добавить текущую дату и время по Москве (UTC+3) в формате `YYYY-MM-DD HH:MM —`
+- Пример кода:
+```python
+from datetime import datetime, timezone, timedelta
+moscow_tz = timezone(timedelta(hours=3))
+moscow_time = datetime.now(moscow_tz)
+timestamp = moscow_time.strftime('%Y-%m-%d %H:%M')
+```
+
 **URL-ссылки в дневнике и статусе:**
 - Все URL (http://, https://) автоматически конвертируются в ссылки
 - Текст ссылки: "Жмякай сюды"
