@@ -123,7 +123,16 @@ def update_status(repo_root):
     def generate_section_html(items):
         if not items:
             return '                    <li>—</li>'
-        return '\n'.join([f'                    <li>{item}</li>' for item in items])
+        # Convert URLs to links in status items
+        html_items = []
+        for item in items:
+            item_html = re.sub(
+                r'(https?://[^\s<>]+)',
+                r'<a href="\1" target="_blank">Жмякай сюды</a>',
+                item
+            )
+            html_items.append(f'                    <li>{item_html}</li>')
+        return '\n'.join(html_items)
     
     # Read index.html
     with open(index_file, 'r', encoding='utf-8') as f:
