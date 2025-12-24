@@ -48,9 +48,22 @@ def update_log(repo_root):
     # Generate HTML
     log_html_parts = []
     for date_time, text in entries:
+        # Convert URLs to links with "Жмякай сюды" text
+        # Remove trailing punctuation from URLs
+        def replace_url(match):
+            url = match.group(0)
+            # Strip trailing punctuation
+            trailing = ''
+            while url and url[-1] in '.,;!?':
+                trailing = url[-1] + trailing
+                url = url[:-1]
+            return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
+        
+        text_html = re.sub(r'https?://[^\s<>]+', replace_url, text)
+        
         log_html_parts.append(f'''            <div class="log-entry">
                 <span class="log-date">{date_time}</span>
-                <p class="log-text">{text}</p>
+                <p class="log-text">{text_html}</p>
             </div>''')
     
     log_html = '\n'.join(log_html_parts)
@@ -126,11 +139,17 @@ def update_status(repo_root):
         # Convert URLs to links in status items
         html_items = []
         for item in items:
-            item_html = re.sub(
-                r'(https?://[^\s<>]+)',
-                r'<a href="\1" target="_blank">Жмякай сюды</a>',
-                item
-            )
+            # Convert URLs to links
+            def replace_url(match):
+                url = match.group(0)
+                # Strip trailing punctuation
+                trailing = ''
+                while url and url[-1] in '.,;!?':
+                    trailing = url[-1] + trailing
+                    url = url[:-1]
+                return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
+            
+            item_html = re.sub(r'https?://[^\s<>]+', replace_url, item)
             html_items.append(f'                    <li>{item_html}</li>')
         return '\n'.join(html_items)
     
