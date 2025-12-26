@@ -13,6 +13,9 @@ from pathlib import Path
 
 SCHEME_START_MARKER = '<!-- PROJECT_SCHEME_START -->'
 SCHEME_END_MARKER = '<!-- PROJECT_SCHEME_END -->'
+VIDEO_TOKEN = '{видео}'
+VIDEO_HREF = 'assets/video/SVETOSILA.mp4'
+VIDEO_LINK_HTML = f'<a href="{VIDEO_HREF}" target="_blank">Видео</a>'
 
 
 def _extract_title_from_md(md_text: str) -> str | None:
@@ -156,6 +159,7 @@ def update_log(repo_root):
             return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
         
         text_html = re.sub(r'https?://[^\s<>]+', replace_url, text)
+        text_html = text_html.replace(VIDEO_TOKEN, VIDEO_LINK_HTML)
         
         log_html_parts.append(f'''            <div class="log-entry">
                 <span class="log-date">{date_time}</span>
@@ -246,6 +250,7 @@ def update_status(repo_root):
                 return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
             
             item_html = re.sub(r'https?://[^\s<>]+', replace_url, item)
+            item_html = item_html.replace(VIDEO_TOKEN, VIDEO_LINK_HTML)
             html_items.append(f'                    <li>{item_html}</li>')
         return '\n'.join(html_items)
     
