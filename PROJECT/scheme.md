@@ -2,6 +2,6 @@
 
 ```mermaid
 flowchart TD
-  User["fa:fa-user Пользователь"]
+  User@{ icon: "fa:user", form: "circle", label: "Пользователь", pos: "b", h: 60 }
 
 ```
