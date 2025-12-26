@@ -66,7 +66,7 @@ def update_project_scheme(repo_root):
     with open(index_file, 'r', encoding='utf-8') as f:
         index_content = f.read()
 
-    # Replace content between markers
+    # Replace content between markers (there should be exactly one block; if multiple exist, replace the LAST one)
     marker_pattern = re.compile(
         re.escape(SCHEME_START_MARKER) + r'[\s\S]*?' + re.escape(SCHEME_END_MARKER),
         flags=re.DOTALL
@@ -82,7 +82,14 @@ def update_project_scheme(repo_root):
     )
 
     if SCHEME_START_MARKER in index_content and SCHEME_END_MARKER in index_content:
-        new_content = marker_pattern.sub(replacement_block, index_content)
+        matches = list(marker_pattern.finditer(index_content))
+        if len(matches) > 1:
+            print(f"[!] Warning: found {len(matches)} PROJECT_SCHEME blocks in index.html; replacing the last one")
+        if not matches:
+            print("[!] Could not locate PROJECT_SCHEME block in index.html")
+            return False
+        last = matches[-1]
+        new_content = index_content[: last.start()] + replacement_block + index_content[last.end() :]
     else:
         # Fallback: insert after hero-grid block (before the progress script)
         insert_point = index_content.find('</div>\n\n    <script>')
