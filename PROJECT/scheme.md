@@ -34,5 +34,7 @@ flowchart LR
   BE <---> DB
   FW <---> PR
   USER <---> TS
-  TS ---> PR
+  TS --CTP-файл--> PR
+  TS <--CTP-файл--> FE
+
 ```
