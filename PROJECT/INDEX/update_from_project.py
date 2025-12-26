@@ -11,6 +11,82 @@ import re
 import sys
 from pathlib import Path
 
+SCHEME_START_MARKER = '<!-- PROJECT_SCHEME_START -->'
+SCHEME_END_MARKER = '<!-- PROJECT_SCHEME_END -->'
+
+
+def _extract_mermaid_from_md(md_text: str) -> str | None:
+    """
+    Extract Mermaid code from a markdown file.
+    Expected format:
+        ```mermaid
+        ...code...
+        ```
+    Returns the code without fences, or None if not found.
+    """
+    m = re.search(r'```mermaid\s*(.*?)\s*```', md_text, flags=re.DOTALL | re.IGNORECASE)
+    if not m:
+        return None
+    code = m.group(1).strip('\n')
+    # Remove leading blank lines inside the code block, keep formatting otherwise
+    return code.strip()
+
+
+def update_project_scheme(repo_root):
+    """Insert/update Mermaid diagram from PROJECT/scheme.md into PROJECT/INDEX/index.html under hero block (no heading)."""
+    scheme_file = Path(repo_root) / 'PROJECT' / 'scheme.md'
+    index_file = Path(repo_root) / 'PROJECT' / 'INDEX' / 'index.html'
+
+    if not index_file.exists():
+        print(f"[!] Index file not found: {index_file}")
+        return False
+
+    if not scheme_file.exists():
+        print(f"[!] Scheme file not found: {scheme_file}")
+        return False
+
+    with open(scheme_file, 'r', encoding='utf-8') as f:
+        scheme_md = f.read()
+
+    mermaid_code = _extract_mermaid_from_md(scheme_md)
+    if not mermaid_code:
+        print("[!] No Mermaid code block found in PROJECT/scheme.md")
+        return False
+
+    with open(index_file, 'r', encoding='utf-8') as f:
+        index_content = f.read()
+
+    # Replace content between markers
+    marker_pattern = re.compile(
+        re.escape(SCHEME_START_MARKER) + r'[\s\S]*?' + re.escape(SCHEME_END_MARKER),
+        flags=re.DOTALL
+    )
+
+    replacement_block = (
+        f"{SCHEME_START_MARKER}\n"
+        f"    <div style=\"max-width: 1400px; margin: 0 auto; padding: 20px 20px 0 20px;\">\n"
+        f"        <div class=\"mermaid\">\n{mermaid_code}\n        </div>\n"
+        f"    </div>\n"
+        f"    {SCHEME_END_MARKER}"
+    )
+
+    if SCHEME_START_MARKER in index_content and SCHEME_END_MARKER in index_content:
+        new_content = marker_pattern.sub(replacement_block, index_content)
+    else:
+        # Fallback: insert after hero-grid block (before the progress script)
+        insert_point = index_content.find('</div>\n\n    <script>')
+        if insert_point == -1:
+            print("[!] Could not find insertion point for project scheme in index.html")
+            return False
+        new_content = index_content[:insert_point] + '\n\n' + replacement_block + '\n' + index_content[insert_point:]
+
+    with open(index_file, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+
+    print("[OK] Updated project Mermaid scheme in index.html")
+    return True
+
+
 def update_log(repo_root):
     """Обновить дневник коротышек из PROJECT/log.md"""
     log_file = Path(repo_root) / 'PROJECT' / 'log.md'
@@ -211,6 +287,11 @@ def main():
     
     # Update status
     if not update_status(repo_root):
+        success = False
+
+    # Update project scheme
+    if not update_project_scheme(repo_root):
+        # Non-fatal: keep pipeline going, but mark overall as failed
         success = False
     
     print('=' * 60)
