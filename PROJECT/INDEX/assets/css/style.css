@@ -326,9 +326,37 @@ body {
 
 @media (max-width: 768px) {
     .mermaid {
-        /* keep same side gutters as the rest of the page on mobile */
-        padding: 0 20px;
+        padding: 0;
         margin: 12px 0 20px 0;
+    }
+}
+
+/* Main-page scheme block (under hero grid) */
+.scheme-block {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 20px 0 20px;
+}
+
+.scheme-block h2 {
+    color: #8d8d8d;
+    font-size: 1.54em;
+    font-weight: 300;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #8d8d8d;
+    text-decoration: none !important;
+    cursor: default !important;
+}
+
+.scheme-block .mermaid {
+    margin-top: 0;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .scheme-block {
+        padding: 20px 20px 0 20px; /* match page side gutters on mobile */
     }
 }
 

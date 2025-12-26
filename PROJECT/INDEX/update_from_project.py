@@ -76,7 +76,7 @@ def update_project_scheme(repo_root):
 
     replacement_block = (
         f"{SCHEME_START_MARKER}\n"
-        f"    <div class=\"section\" style=\"max-width: 1400px; margin: 0 auto; padding: 20px 20px 0 20px;\">\n"
+        f"    <div class=\"scheme-block\">\n"
         f"{title_html}"
         f"        <div class=\"mermaid\">\n{mermaid_code}\n        </div>\n"
         f"    </div>\n"
