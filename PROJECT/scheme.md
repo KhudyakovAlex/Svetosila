@@ -3,6 +3,6 @@
 ```mermaid
 
 flowchart TD
-  User@{ icon: "fa:fa-user", form: "circle", label: "Пользователь", pos: "b", h: 60 }
+  User@{ icon: "fa6-solid:user", form: "circle", label: "Пользователь", pos: "b", h: 60 }
 
 ```
