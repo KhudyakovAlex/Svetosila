@@ -1,7 +1,8 @@
 # Схема АПК
 
 ```mermaid
+
 flowchart TD
-  User@{ icon: "fa:user", form: "circle", label: "Пользователь", pos: "b", h: 60 }
+  User@{ icon: "fa:fa-user", form: "circle", label: "Пользователь", pos: "b", h: 60 }
 
 ```
