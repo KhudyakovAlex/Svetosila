@@ -27,7 +27,7 @@ flowchart LR
 
   USER <---> FE
   FE <---> BE
-  BE <--GSM--> FW
+  BE <--GSM/REST-API--> FW
   FW <--LoRaWAN--> LUM
   BE <---> DB
 ```

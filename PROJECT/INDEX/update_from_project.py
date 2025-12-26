@@ -15,6 +15,15 @@ SCHEME_START_MARKER = '<!-- PROJECT_SCHEME_START -->'
 SCHEME_END_MARKER = '<!-- PROJECT_SCHEME_END -->'
 
 
+def _extract_title_from_md(md_text: str) -> str | None:
+    """Extract the first Markdown H1 title (line starting with '# ')."""
+    for line in md_text.splitlines():
+        s = line.strip()
+        if s.startswith('# '):
+            return s[2:].strip()
+    return None
+
+
 def _extract_mermaid_from_md(md_text: str) -> str | None:
     """
     Extract Mermaid code from a markdown file.
@@ -48,6 +57,7 @@ def update_project_scheme(repo_root):
     with open(scheme_file, 'r', encoding='utf-8') as f:
         scheme_md = f.read()
 
+    scheme_title = _extract_title_from_md(scheme_md)
     mermaid_code = _extract_mermaid_from_md(scheme_md)
     if not mermaid_code:
         print("[!] No Mermaid code block found in PROJECT/scheme.md")
@@ -62,9 +72,12 @@ def update_project_scheme(repo_root):
         flags=re.DOTALL
     )
 
+    title_html = f"        <h2>{scheme_title}</h2>\n" if scheme_title else ""
+
     replacement_block = (
         f"{SCHEME_START_MARKER}\n"
-        f"    <div style=\"max-width: 1400px; margin: 0 auto; padding: 20px 20px 0 20px;\">\n"
+        f"    <div class=\"section\" style=\"max-width: 1400px; margin: 0 auto; padding: 20px 20px 0 20px;\">\n"
+        f"{title_html}"
         f"        <div class=\"mermaid\">\n{mermaid_code}\n        </div>\n"
         f"    </div>\n"
         f"    {SCHEME_END_MARKER}"
