@@ -7,19 +7,21 @@ flowchart LR
 
   subgraph ПК
     subgraph Браузер
-      FE(Клиент)
+      FE(АПК Клиент)
+      TS(Т-Студия)
     end
   end
 
   subgraph Сервер
     direction TB
-     BE(Сервер)
+     BE(АПК Сервер)
      DB[(БД)]
   end
 
   subgraph ШУНО
     subgraph RAPIDA
       FW(Прошивка)
+      PR[(Проект)]
     end
   end
 
@@ -30,4 +32,7 @@ flowchart LR
   BE <--GSM/REST-API--> FW
   FW <--LoRaWAN--> LUM
   BE <---> DB
+  FW <---> PR
+  USER <---> TS
+  TS ---> PR
 ```
