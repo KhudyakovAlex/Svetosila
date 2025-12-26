@@ -13,9 +13,27 @@ from pathlib import Path
 
 SCHEME_START_MARKER = '<!-- PROJECT_SCHEME_START -->'
 SCHEME_END_MARKER = '<!-- PROJECT_SCHEME_END -->'
-VIDEO_TOKEN = '{видео}'
-VIDEO_HREF = 'assets/video/SVETOSILA.mp4'
-VIDEO_LINK_HTML = f'<a href="{VIDEO_HREF}" target="_blank">Видео</a>'
+
+def _linkify_to_zhmyakay(text: str) -> str:
+    """
+    Convert URLs/paths to clickable links with text "Жмякай сюды".
+    Supported:
+      - https://...
+      - http://...
+      - assets/... (relative links for our site, e.g. assets/video/SVETOSILA.mp4)
+    The original URL/path is NOT shown on the page.
+    """
+    def replace_url(match):
+        url = match.group(0)
+        # Strip trailing punctuation
+        trailing = ''
+        while url and url[-1] in '.,;!?':
+            trailing = url[-1] + trailing
+            url = url[:-1]
+        return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
+
+    # Match http(s) URLs or our relative asset links
+    return re.sub(r'(https?://[^\s<>]+|assets/[^\s<>]+)', replace_url, text)
 
 
 def _extract_title_from_md(md_text: str) -> str | None:
@@ -147,19 +165,7 @@ def update_log(repo_root):
     # Generate HTML
     log_html_parts = []
     for date_time, text in entries:
-        # Convert URLs to links with "Жмякай сюды" text
-        # Remove trailing punctuation from URLs
-        def replace_url(match):
-            url = match.group(0)
-            # Strip trailing punctuation
-            trailing = ''
-            while url and url[-1] in '.,;!?':
-                trailing = url[-1] + trailing
-                url = url[:-1]
-            return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
-        
-        text_html = re.sub(r'https?://[^\s<>]+', replace_url, text)
-        text_html = text_html.replace(VIDEO_TOKEN, VIDEO_LINK_HTML)
+        text_html = _linkify_to_zhmyakay(text)
         
         log_html_parts.append(f'''            <div class="log-entry">
                 <span class="log-date">{date_time}</span>
@@ -236,21 +242,9 @@ def update_status(repo_root):
     def generate_section_html(items):
         if not items:
             return '                    <li>—</li>'
-        # Convert URLs to links in status items
         html_items = []
         for item in items:
-            # Convert URLs to links
-            def replace_url(match):
-                url = match.group(0)
-                # Strip trailing punctuation
-                trailing = ''
-                while url and url[-1] in '.,;!?':
-                    trailing = url[-1] + trailing
-                    url = url[:-1]
-                return f'<a href="{url}" target="_blank">Жмякай сюды</a>{trailing}'
-            
-            item_html = re.sub(r'https?://[^\s<>]+', replace_url, item)
-            item_html = item_html.replace(VIDEO_TOKEN, VIDEO_LINK_HTML)
+            item_html = _linkify_to_zhmyakay(item)
             html_items.append(f'                    <li>{item_html}</li>')
         return '\n'.join(html_items)
     
