@@ -308,6 +308,29 @@ body {
     }
 }
 
+/* Mermaid (main page + docs) */
+.mermaid {
+    background: transparent;
+    margin: 20px 0;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Make Mermaid SVG responsive (especially important on mobile) */
+.mermaid svg {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+@media (max-width: 768px) {
+    .mermaid {
+        padding: 0;
+        margin: 12px 0 20px 0;
+    }
+}
+
 /* ========================================
    Document Page Styles
    ======================================== */
