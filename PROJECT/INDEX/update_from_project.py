@@ -72,10 +72,12 @@ def update_project_scheme(repo_root):
         flags=re.DOTALL
     )
 
+    title_line = f"            <h2>{scheme_title}</h2>\n" if scheme_title else ""
+
     replacement_block = (
         f"{SCHEME_START_MARKER}\n"
         f"        <div class=\"section project-scheme\">\n"
-        f"{'            <h2>' + scheme_title + '</h2>\\n' if scheme_title else ''}"
+        f"{title_line}"
         f"            <div class=\"mermaid\">\n{mermaid_code}\n            </div>\n"
         f"        </div>\n"
         f"        {SCHEME_END_MARKER}"
