@@ -326,7 +326,8 @@ body {
 
 @media (max-width: 768px) {
     .mermaid {
-        padding: 0;
+        /* keep same side gutters as the rest of the page on mobile */
+        padding: 0 20px;
         margin: 12px 0 20px 0;
     }
 }
