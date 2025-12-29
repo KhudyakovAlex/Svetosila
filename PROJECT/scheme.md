@@ -42,12 +42,12 @@ CB2@{ shape: f-circ, label: "" }
   CB2 ===> LUM3
   CB2 ===> LUM4
 
-subgraph Светильник
+subgraph Светильник 1
   LW1(LoRaWAN<br>модуль)
   LUM3((Светильник))
 end
 
-subgraph Светильник
+subgraph Светильник 2
   LW2(LoRaWAN<br>модуль)
   LUM4((Светильник))
 end
@@ -78,12 +78,12 @@ CB1@{ shape: f-circ, label: "" }
   CB1 ===> PLC1
   CB1 ===> PLC2
 
-subgraph Светильник
+subgraph Светильник 3
   PLC1(PLC<br>модуль)
   LUM1((Светильник))
 end
 
-subgraph Светильник
+subgraph Светильник 4
   PLC2(PLC<br>модуль)
   LUM2((Светильник))  
 end
@@ -92,6 +92,5 @@ end
   PLC1 ===> LUM1
   PLC2 <---> LUM2
   PLC2 ===> LUM2
-
-
+  
 ```
