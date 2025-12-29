@@ -1,6 +1,7 @@
 # Схема АПК
 
 ```mermaid
+
 flowchart LR
 
 CW(Клиент АПК<br>Веб)
@@ -41,12 +42,12 @@ CB2@{ shape: f-circ, label: "" }
   CB2 ===> LUM3
   CB2 ===> LUM4
 
-subgraph  
+subgraph Светильник
   LW1(LoRaWAN<br>модуль)
   LUM3((Светильник))
 end
 
-subgraph  
+subgraph Светильник
   LW2(LoRaWAN<br>модуль)
   LUM4((Светильник))
 end
@@ -59,7 +60,7 @@ LW2 <---> LUM4
 TP2(Точка<br>подключения)
   TP2 ==220В==> AV2
 
-subgraph ШУНО - PLC
+subgraph ШУНО - PLC  
   R2(Контроллер<br>RAPIDA)
   PLC(PLC<br>база)
   AV2(Выключатель)
@@ -77,12 +78,12 @@ CB1@{ shape: f-circ, label: "" }
   CB1 ===> PLC1
   CB1 ===> PLC2
 
-subgraph
+subgraph Светильник
   PLC1(PLC<br>модуль)
   LUM1((Светильник))
 end
 
-subgraph
+subgraph Светильник
   PLC2(PLC<br>модуль)
   LUM2((Светильник))  
 end
@@ -91,5 +92,6 @@ end
   PLC1 ===> LUM1
   PLC2 <---> LUM2
   PLC2 ===> LUM2
+
 
 ```

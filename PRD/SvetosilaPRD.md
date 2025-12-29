@@ -2,7 +2,7 @@
 
 АПК Светосила. Версия: MAX
 
-**Последнее изменение:** 29.12.2025, 09:15 МСК
+**Последнее изменение:** 29.12.2025, 09:30 МСК
 
 ## 1. Термины и определения
 
@@ -119,12 +119,12 @@ CB2@{ shape: f-circ, label: "" }
   CB2 ===> LUM3
   CB2 ===> LUM4
 
-subgraph  
+subgraph Светильник
   LW1(LoRaWAN<br>модуль)
   LUM3((Светильник))
 end
 
-subgraph  
+subgraph Светильник
   LW2(LoRaWAN<br>модуль)
   LUM4((Светильник))
 end
@@ -155,12 +155,12 @@ CB1@{ shape: f-circ, label: "" }
   CB1 ===> PLC1
   CB1 ===> PLC2
 
-subgraph  
+subgraph Светильник
   PLC1(PLC<br>модуль)
   LUM1((Светильник))
 end
 
-subgraph  
+subgraph Светильник
   PLC2(PLC<br>модуль)
   LUM2((Светильник))  
 end
