@@ -72,8 +72,22 @@ def update_project_scheme(repo_root):
         return False
 
     if not scheme_file.exists():
-        print(f"[!] Scheme file not found: {scheme_file}")
-        return False
+        # Remove scheme block from index.html if it exists
+        with open(index_file, 'r', encoding='utf-8') as f:
+            index_content = f.read()
+        
+        if SCHEME_START_MARKER in index_content and SCHEME_END_MARKER in index_content:
+            marker_pattern = re.compile(
+                re.escape(SCHEME_START_MARKER) + r'[\s\S]*?' + re.escape(SCHEME_END_MARKER),
+                flags=re.DOTALL
+            )
+            new_content = marker_pattern.sub('', index_content)
+            with open(index_file, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            print("[OK] Removed project scheme block from index.html (scheme.md not found)")
+        else:
+            print("[OK] No scheme block to remove (scheme.md not found)")
+        return True
 
     with open(scheme_file, 'r', encoding='utf-8') as f:
         scheme_md = f.read()
