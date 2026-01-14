@@ -110,7 +110,7 @@ python PROJECT\INDEX\update_from_project.py
 Скрипт автоматически:
 - Читает `PROJECT/log.md` и обновляет раздел "Дневник коротышек" в `index.html`
 - Читает `PROJECT/status.md` и обновляет статусные блоки в `index.html`
-- Читает `PROJECT/scheme.md` и вставляет Mermaid-схему на главную страницу **под hero-блоком** (журнал + корабль + статус), **без заголовка**
+- Конвертирует все `PDS/*.md` файлы в `PROJECT/INDEX/PDS/*.html` (с Mermaid-диаграммами, оглавлением)
 
 ### Mermaid-схема на главной странице (PROJECT/scheme.md)
 
@@ -197,7 +197,8 @@ D:\Git\Svetosila\
 **При каждом `git commit` автоматически:**
 1. Обновляются даты в MD-файлах (`update_dates.py`)
 2. Синхронизируются `log.md` и `status.md` с `index.html` (`update_from_project.py`)
-3. Обновленный `index.html` добавляется в коммит
+3. Конвертируются `PDS/*.md` → `PROJECT/INDEX/PDS/*.html` (`convert_pds_to_html.py`)
+4. Обновленные HTML-файлы добавляются в коммит
 
 **Hook установлен в:** `.git/hooks/pre-commit`
 
@@ -225,7 +226,8 @@ git commit --no-verify
    Hook автоматически:
    - Обновит даты в PDS/*.md
    - Синхронизирует PROJECT/*.md → index.html
-   - Добавит index.html в коммит
+   - Конвертирует PDS/*.md → PROJECT/INDEX/PDS/*.html
+   - Добавит обновлённые HTML-файлы в коммит
 
 4. **Отправить на GitHub:**
    ```bash

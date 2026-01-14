@@ -8,6 +8,7 @@
 """
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -301,6 +302,43 @@ def update_status(repo_root):
     return True
 
 
+def convert_pds_to_html(repo_root):
+    """Convert PDS markdown files to HTML"""
+    try:
+        import subprocess
+        script_path = Path(repo_root) / 'PROJECT' / 'INDEX' / 'convert_pds_to_html.py'
+        if not script_path.exists():
+            print(f"[!] PDS converter script not found: {script_path}")
+            return False
+        
+        result = subprocess.run(
+            [sys.executable, str(script_path)],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        # Print output from converter
+        if result.stdout:
+            print(result.stdout, end='')
+        if result.stderr:
+            print(result.stderr, end='', file=sys.stderr)
+        
+        if result.returncode != 0:
+            print("[!] PDS converter exited with errors")
+            return False
+        
+        print("[OK] Converted PDS markdown files to HTML")
+        return True
+        
+    except subprocess.TimeoutExpired:
+        print("[!] PDS converter timed out after 60 seconds")
+        return False
+    except Exception as e:
+        print(f"[!] Error running PDS converter: {e}")
+        return False
+
+
 def main():
     """Main function"""
     print('=' * 60)
@@ -324,6 +362,11 @@ def main():
 
     # Update project scheme
     if not update_project_scheme(repo_root):
+        # Non-fatal: keep pipeline going, but mark overall as failed
+        success = False
+    
+    # Convert PDS markdown to HTML
+    if not convert_pds_to_html(repo_root):
         # Non-fatal: keep pipeline going, but mark overall as failed
         success = False
     
