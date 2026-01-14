@@ -53,11 +53,10 @@
 <p>Светосила v1.0. Спецификации на разработку</p>
 <p><strong>Последнее изменение:</strong> 13.12.2025, 19:20 МСК</p>
 <div class="mermaid">erDiagram
-    AC_ROLES ||--o{ AC_USERS : "ROLE_ID"
-    AC_ROLES ||--o{ AC_ROLE_PERMISSIONS : "ROLE_ID"
-    AC_PERMISSIONS ||--o{ AC_ROLE_PERMISSIONS : "PERMISSION_ID"
     AC_ROLES ||--o{ AC_ROLE_ROLES : "PARENT_ROLE_ID"
     AC_ROLES ||--o{ AC_ROLE_ROLES : "CHILD_ROLE_ID"
+    AC_PERMISSIONS ||--o{ AC_TABLES : "AC_PERMISSION_ID"
+    AC_TABLES ||--o{ AC_FIELDS : "AC_TABLE_ID"
 
     AC_USERS {
         INTEGER ID PK
@@ -95,9 +94,6 @@
         INTEGER CHILD_ROLE_ID FK
     }
 
-    AC_PERMISSIONS ||--o{ AC_TABLES : "AC_PERMISSION_ID"
-    AC_TABLES ||--o{ AC_FIELDS : "AC_TABLE_ID"
-
     AC_TABLES {
         INTEGER ID PK
         TEXT NAME
@@ -109,6 +105,7 @@
         TEXT NAME
         INTEGER AC_TABLE_ID FK
     }
+
 </div>
 <h2 id="1-назначение-документа">1. Назначение документа</h2>
 <p>Описать структуру базы данных системы контроля доступа.</p>
