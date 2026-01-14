@@ -80,6 +80,118 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
+def parse_db_structure(md_content: str) -> dict:
+    """Parse database structure from markdown to extract tables and relationships"""
+    tables = {}
+    current_table = None
+    
+    # First pass: collect all tables and fields
+    lines = md_content.split('\n')
+    for i, line in enumerate(lines):
+        # Match table headers: ### 4.X. TABLE_NAME
+        table_match = re.match(r'^###\s+\d+\.\d+\.\s+([A-Z_]+)', line)
+        if table_match:
+            table_name = table_match.group(1)
+            current_table = table_name
+            tables[table_name] = {'fields': [], 'fk_relations': []}
+            continue
+        
+        if current_table and line.strip().startswith('- '):
+            # Parse field: - FIELD_NAME (TYPE / PK) or - FIELD_NAME (TYPE / FK) - description
+            field_match = re.match(r'^-\s+([A-Z_]+)\s+\(([^)]+)\)', line)
+            if field_match:
+                field_name = field_match.group(1)
+                field_type_info = field_match.group(2)
+                
+                # Parse type and constraints
+                parts = [p.strip() for p in field_type_info.split('/')]
+                field_type = parts[0] if parts else 'TEXT'
+                is_pk = 'PK' in field_type_info
+                is_fk = 'FK' in field_type_info
+                
+                tables[current_table]['fields'].append({
+                    'name': field_name,
+                    'type': field_type,
+                    'is_pk': is_pk,
+                    'is_fk': is_fk
+                })
+    
+    # Second pass: build FK relationships (now all tables are known)
+    for table_name, table_info in tables.items():
+        for field in table_info['fields']:
+            if field['is_fk'] and field['name'].endswith('_ID'):
+                # Try to find referenced table name
+                # E.g., LUM_TYPE_ID -> LUM_TYPES, POINT_ID -> POINTS
+                ref_base = field['name'][:-3]  # Remove _ID
+                
+                # Try variations: exact match, with S, ES, IES
+                possible_refs = [
+                    ref_base,
+                    ref_base + 'S',
+                    ref_base + 'ES',
+                ]
+                
+                # Also try singular -> plural transformations
+                if ref_base.endswith('Y'):
+                    possible_refs.append(ref_base[:-1] + 'IES')
+                
+                # Special cases for known patterns
+                if ref_base == 'LUM_TYPE':
+                    possible_refs.insert(0, 'LUM_TYPES')
+                elif ref_base == 'POWER_LINE':
+                    possible_refs.insert(0, 'POWER_LINES')
+                elif ref_base == 'WIRE_TYPE':
+                    possible_refs.insert(0, 'WIRE_TYPES')
+                elif ref_base == 'PARENT_ROLE':
+                    possible_refs.insert(0, 'AC_ROLES')
+                elif ref_base == 'CHILD_ROLE':
+                    possible_refs.insert(0, 'AC_ROLES')
+                elif ref_base == 'AC_TABLE':
+                    possible_refs.insert(0, 'AC_TABLES')
+                
+                # Find matching table
+                ref_table = None
+                for ref in possible_refs:
+                    if ref in tables:
+                        ref_table = ref
+                        break
+                
+                if ref_table:
+                    table_info['fk_relations'].append({
+                        'field': field['name'],
+                        'ref_table': ref_table
+                    })
+    
+    return tables
+
+
+def generate_mermaid_schema(tables: dict) -> str:
+    """Generate Mermaid ER diagram from parsed database structure"""
+    lines = ['erDiagram']
+    
+    # First, generate relationships
+    for table_name, table_info in tables.items():
+        for fk in table_info['fk_relations']:
+            ref_table = fk['ref_table']
+            fk_field = fk['field']
+            # Format: REF_TABLE ||--o{ TABLE : "FK_FIELD"
+            lines.append(f'    {ref_table} ||--o{{ {table_name} : "{fk_field}"')
+    
+    # Add empty line
+    lines.append('')
+    
+    # Then, generate table definitions
+    for table_name, table_info in tables.items():
+        lines.append(f'    {table_name} {{')
+        for field in table_info['fields']:
+            marker = 'PK' if field['is_pk'] else ('FK' if field['is_fk'] else '')
+            lines.append(f'        {field["type"]} {field["name"]} {marker}'.rstrip())
+        lines.append('    }')
+        lines.append('')
+    
+    return '\n'.join(lines)
+
+
 def add_heading_ids(html_content: str) -> str:
     """Add id attributes to h2 and h3 headings for anchor links"""
     def generate_id(text):
@@ -115,14 +227,17 @@ def convert_pds_file(md_file: Path, repo_root: Path, index_root: Path):
     with open(md_file, 'r', encoding='utf-8') as f:
         md_content = f.read()
     
-    # Special handling for database files - inject schema from corresponding scheme file
+    # Special handling for database files - inject schema
     scheme_mapping = {
         'SvetosilaPDS_DB.md': 'SvetosilaPDS_DB_scheme.md',
         'SvetosilaPDS_DB_AC.md': 'SvetosilaPDS_DB_AC_scheme.md',
     }
+    
+    schema_injected = False
     if md_file.name in scheme_mapping:
         scheme_file = md_file.parent / scheme_mapping[md_file.name]
         if scheme_file.exists():
+            # Use existing scheme file
             with open(scheme_file, 'r', encoding='utf-8') as f:
                 scheme_content = f.read()
             # Extract only the mermaid block from scheme file
@@ -136,6 +251,27 @@ def convert_pds_file(md_file: Path, repo_root: Path, index_root: Path):
                     md_content,
                     count=1
                 )
+                schema_injected = True
+        
+        if not schema_injected:
+            # Auto-generate schema from table descriptions
+            print(f"  > Auto-generating schema for {md_file.name}")
+            try:
+                tables = parse_db_structure(md_content)
+                if tables:
+                    mermaid_schema = generate_mermaid_schema(tables)
+                    mermaid_block = f'```mermaid\n{mermaid_schema}\n```'
+                    # Insert mermaid block after metadata
+                    md_content = re.sub(
+                        r'(\*\*Последнее изменение:\*\*[^\n]*\n)',
+                        r'\1\n' + mermaid_block + '\n',
+                        md_content,
+                        count=1
+                    )
+                    schema_injected = True
+                    print(f"  > Generated schema with {len(tables)} tables")
+            except Exception as e:
+                print(f"  ! Warning: Could not auto-generate schema: {e}")
     
     # Get title from first heading
     title_match = re.search(r'^#\s+(.+)$', md_content, re.MULTILINE)

@@ -58,10 +58,10 @@
     PILLARS ||--o{ LUMINAIRES : "PILLAR_ID"
     POINTS ||--o{ BOARDS : "POINT_ID"
     POINTS ||--o{ CONNECT_POINTS : "POINT_ID"
-    POINTS ||--o{ PILLARS : "POINT_ID"
-    POINTS ||--o{ POWER_LINE_POINTS : "POINT_ID"
     WIRE_TYPES ||--o{ POWER_LINES : "WIRE_TYPE_ID"
     POWER_LINES ||--o{ POWER_LINE_POINTS : "POWER_LINE_ID"
+    POINTS ||--o{ POWER_LINE_POINTS : "POINT_ID"
+    POINTS ||--o{ PILLARS : "POINT_ID"
 
     LUMINAIRES {
         INTEGER ID PK
@@ -89,6 +89,7 @@
         INTEGER ID PK
         TEXT NAME
         INTEGER POINT_ID FK
+        TEXT IP
     }
 
     CONNECT_POINTS {
@@ -102,6 +103,8 @@
         TEXT NAME
         REAL LENGTH
         INTEGER WIRE_TYPE_ID FK
+        INTEGER LINE_RELAY_ID
+        BOOLEAN UNDER_VOLTAGE
     }
 
     POWER_LINE_POINTS {
@@ -121,6 +124,7 @@
         TEXT NAME
         INTEGER POINT_ID FK
     }
+
 </div>
 <h2 id="1-назначение-документа">1. Назначение документа</h2>
 <p>Описать структуру базы данных.</p>
